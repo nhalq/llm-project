@@ -3,5 +3,6 @@ langchain-groq
 langchain-huggingface
 langchain-chroma
 langchain-community
-
 sentence-transformers
+
+fastapi[standard]
