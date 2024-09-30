@@ -2,8 +2,10 @@ import core.embedding
 from langchain_chroma import Chroma
 
 
-def create(collection_name='vector_store'):
+def bind(collection_name: str, persist_directory: str = 'data'):
+    embedding_function = core.embedding.create()
     vector_store = Chroma(collection_name=collection_name,
-                          # persist_directory='data',
-                          embedding_function=core.embedding.create())
+                          embedding_function=embedding_function,
+                          persist_directory=persist_directory,)
+
     return vector_store

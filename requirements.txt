@@ -1,8 +1,13 @@
+# Core modules
+firecrawl
+sentence-transformers
+
+# Langchain wrappers
 langchain
 langchain-groq
 langchain-huggingface
 langchain-chroma
 langchain-community
-sentence-transformers
 
+# Backend modules
 fastapi[standard]

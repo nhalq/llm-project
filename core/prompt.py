@@ -1,19 +1,21 @@
-from langchain_core.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessage
-
-DEFAULT_SYSTEM_PROMPT = """
-You are an assistant for question-answering tasks.
-Use the following pieces of retrieved context to answer the question in vietnamese.
-If you don't know the answer, just say that you don't know.
-Use three sentences maximum and keep the answer concise."""
-
-DEFAULT_HUMAN_PROMPT = """
-Question: {question}
-Context: {context}
-Answer:"""
+from typing import List
+from langchain_core.prompts.chat import *
 
 
-def create():
-    system = SystemMessage(content=DEFAULT_SYSTEM_PROMPT)
-    human = HumanMessagePromptTemplate.from_template(DEFAULT_HUMAN_PROMPT)
-    prompt = ChatPromptTemplate.from_messages((system, human))
+SYSTEM_PROMT = """Bạn là một trợ lý thực hiện các tác vụ trả lời câu hỏi.
+Sử dụng các mẩu thông tin được cho dưới đây để trả lời câu hỏi của người dùng.
+Nếu bạn không biết câu trả lời, phải trả lời rằng bạn không biết.
+Chỉ được phép sử dụng tiếng Việt và giữ câu trả lời ngắn gọn nhất có thể.
+
+Thông tin liên quan:
+{context}"""
+
+HUMAN_PROMPT = """{question}"""
+
+
+def create(messages: List[BaseMessage] = []):
+    system = SystemMessagePromptTemplate.from_template(SYSTEM_PROMT)
+    human = HumanMessagePromptTemplate.from_template(HUMAN_PROMPT)
+
+    prompt = ChatPromptTemplate.from_messages((system, *messages, human))
     return prompt

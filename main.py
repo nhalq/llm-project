@@ -1,10 +1,12 @@
 __version__ = '0.1'
 __description__ = 'LLM Project - Chatbot API'
 
+from core.chain import RAGInferenceChain
 from fastapi import FastAPI
+from functools import lru_cache
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from pydantic import BaseModel
 
-import core.llm
 import dotenv
 dotenv.load_dotenv()
 
@@ -32,9 +34,13 @@ class ConversationResponseDTO(BaseModel):
     conversation: list[MessageDTO]
 
 
+@lru_cache(maxsize=8)
+def get_rag_chain(knowledge_domain: str):
+    return RAGInferenceChain(knowledge_domain)
+
+
 app = FastAPI(version=__version__, description=__description__)
-llm = core.llm.create()
-store = list()
+store: list[BaseMessage] = []
 
 
 @app.get('/')
@@ -44,15 +50,22 @@ def description() -> APIDescriptionResponseDTO:
 
 @app.get('/conversations')
 def get_conversation() -> ConversationResponseDTO:
-    return ConversationResponseDTO(conversation=store)
+    def message_to_dto(message: BaseMessage) -> MessageDTO:
+        return MessageDTO(role=message.type, message=message.content)
+
+    conversation = map(message_to_dto, store)
+    return ConversationResponseDTO(conversation=conversation)
 
 
 @app.put('/conversations/ask')
 def ask_chatbot(ask_dto: ChatbotAskRequestDTO) -> ChatbotAskResponseDTO:
     user_message = ask_dto.message
-    store.append(MessageDTO(role='user', message=user_message))
+    store.append(HumanMessage(content=user_message))
 
-    assistant_message = llm.invoke(ask_dto.message).content
-    store.append(MessageDTO(role='assistant', message=assistant_message))
+    knowledge_domain = 'thanhnien.vn'
+    chain = get_rag_chain(knowledge_domain)
 
-    return ChatbotAskResponseDTO(message=assistant_message)
+    ai_message = chain(user_message, store)
+    store.append(AIMessage(content=ai_message))
+
+    return ChatbotAskResponseDTO(message=ai_message)
