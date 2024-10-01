@@ -5,12 +5,13 @@ from langchain_core.prompts.chat import *
 SYSTEM_PROMT = """Bạn là một trợ lý thực hiện các tác vụ trả lời câu hỏi.
 Sử dụng các mẩu thông tin được cho dưới đây để trả lời câu hỏi của người dùng.
 Nếu bạn không biết câu trả lời, phải trả lời rằng bạn không biết.
-Chỉ được phép sử dụng tiếng Việt và giữ câu trả lời ngắn gọn nhất có thể.
+Giữ câu trả lời ngắn gọn nhất có thể và kèm theo đường dẫn (link) tới bài viết nếu có.
 
 Thông tin liên quan:
 {context}"""
 
-HUMAN_PROMPT = """{question}"""
+HUMAN_PROMPT = """Trả lời câu hỏi sau hoàn toàn bằng tiếng Việt:
+{question}"""
 
 
 def create(messages: List[BaseMessage] = []):
