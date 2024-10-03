@@ -16,10 +16,22 @@ class FireCrawlScrapeFormat(Enum):
 class FireCrawlScrapeOptions:
     formats: Optional[List[FireCrawlScrapeFormat]]
 
+    def __init__(self, *, formats: Optional[List[FireCrawlScrapeFormat]] = None):
+        self.formats = formats
+
 
 class FireCrawlParams:
     limit: Optional[int]
+    formats: Optional[List[FireCrawlScrapeFormat]]
     scrapeOptions: Optional[FireCrawlScrapeOptions]
+
+    def __init__(self, *,
+                 limit: Optional[int] = None,
+                 formats: Optional[List[FireCrawlScrapeFormat]] = None,
+                 scrapeOptions: Optional[FireCrawlScrapeOptions] = None):
+        self.limit = limit
+        self.formats = formats
+        self.scrapeOptions = scrapeOptions
 
 
 class FireCrawlLoaderWrapper(FireCrawlLoader):
@@ -44,8 +56,10 @@ def create(url: str, *,
            params: Optional[FireCrawlParams] = None) -> FireCrawlLoader:
     if params is None:
         formats = [FireCrawlScrapeFormat.MARKDOWN]
-        scapeOptions = FireCrawlScrapeOptions(formats=formats)
-        params = FireCrawlParams(limit=8, scapeOptions=scapeOptions)
+        scrapeOptions = FireCrawlScrapeOptions(formats=formats)
+        params = FireCrawlParams(limit=8,
+                                 formats=formats,
+                                 scrapeOptions=scrapeOptions)
 
     firecrawl_loader = FireCrawlLoaderWrapper(url=url, mode='crawl', params=params,
                                               api_key=api_key, api_url=api_url)
