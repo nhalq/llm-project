@@ -1,6 +1,7 @@
 import core.store
 import core.llm
 import core.prompt
+import json
 
 from typing import *
 from langchain_core.documents import Document
@@ -16,7 +17,7 @@ class RAGInferenceChain:
 
     @staticmethod
     def aggerate_documents(documents: List[Document]):
-        return '\n\n'.join([document.page_content for document in documents])
+        return '\n\n'.join(['\n'.join([json.dumps(document.metadata), document.page_content]) for document in documents])
 
     def retrive(self, user_prompt: str):
         retriver = self.vector_store.as_retriever()
