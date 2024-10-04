@@ -1,27 +1,33 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './index.css'
 import App from './App'
-import reportWebVitals from './reportWebVitals'
 import { ChatFloating } from './chat/chat-floating'
+import './index.css'
+import reportWebVitals from './reportWebVitals'
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-)
+if (process.env.NODE_ENV === 'development') {
+  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+}
 
-const e = document.createElement('div')
-ReactDOM.createRoot(e).render(
+const chatbotWrapper = document.createElement('div')
+chatbotWrapper.setAttribute('id', 'chatbot')
+chatbotWrapper.setAttribute('style', 'position: fixed; bottom: 0; right: 0; z-index: 9999;')
+document.body.appendChild(chatbotWrapper)
+
+const chatbotRoot =
+  process.env.NODE_ENV === 'development'
+    ? chatbotWrapper
+    : chatbotWrapper.attachShadow({ mode: 'open' })
+ReactDOM.createRoot(chatbotRoot).render(
   <React.StrictMode>
     <ChatFloating />
   </React.StrictMode>
 )
-
-window.addEventListener('load', () => {
-  document.body.appendChild(e)
-})
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

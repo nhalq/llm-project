@@ -4,7 +4,7 @@ import { Button } from '../components/button'
 import { ChatBubble } from './chat-bubble'
 import { Input } from 'components/input'
 
-const ChatbotURL = 'http://192.168.100.97:8000'
+const ChatbotURL = process.env.CHATBOT_URL || 'https://lab.nhalq.dev/chatbot-api'
 
 enum Identifier {
   Human = 'human',
@@ -38,7 +38,7 @@ export function ChatBox({ conversationUUID, open = true, onClose }: ChatBoxProps
     fetch(ChatbotURL + '/c/' + conversationUUID)
       .then((response) => response.json())
       .then(({ conversation }) => setMessages((messages) => messages.concat(conversation)))
-      .catch(() => alert('Không thể kết nối với chatbot'))
+      .catch(() => console.log('Không thể kết nối với chatbot'))
   }, [conversationUUID])
 
   useEffect(() => {

@@ -29,9 +29,8 @@ export function ChatFloating() {
   return (
     <div className="fixed bottom-8 right-8">
       <button className="relative" onClick={() => setOpen(true)}>
-        <div className="absolute bottom-0 right-0 size-6 bg-white -z-1"></div>
         <div
-          className="relative size-12 flex items-center justify-center rounded-full bg-white"
+          className="relative size-12 flex items-center justify-center rounded-full border bg-white"
           onClick={() => setOpen(true)}
         >
           <ChatBubbleLeftRightIcon className="size-6" />
