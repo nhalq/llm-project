@@ -1,39 +1,45 @@
-import core.store
-import core.llm
-import core.prompt
-import json
-
-from typing import *
-from langchain_core.documents import Document
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts.chat import BaseMessage
+from functools import lru_cache
+from pymongo import MongoClient
+from core.llm import create as create_llm
+from core.prompt import create as create_prompt
+from pymongo.errors import OperationFailure
 from langchain_core.runnables import RunnablePassthrough
+from fastapi import HTTPException
+from typing import List
+from core.store import KnowledgeStore 
+from langchain.schema import BaseMessage
 
+MONGODB_ATLAS_URI = "mongodb+srv://minhtri171997:test123@cluster0.vv0ot.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+client = MongoClient(MONGODB_ATLAS_URI)
+db = client['llm_db'] 
+collection = db['llm_collection']  
+
+@lru_cache(maxsize=8)
+def get_rag_chain(knowledge_domain: str):
+    query = {"metadata.keywords": knowledge_domain}  
+    try:
+        mongo_documents = collection.find(query)
+        knowledge_data = [doc.get('text') for doc in mongo_documents if doc.get('text')]
+        return RAGInferenceChain(knowledge_data)
+    except OperationFailure as e:
+        raise HTTPException(status_code=500, detail=f"MongoDB query failed: {str(e)}")
 
 class RAGInferenceChain:
-    def __init__(self, knowledge_domain: str) -> None:
-        self.vector_store = core.store.bind(knowledge_domain)
-        self.llm = core.llm.create()
+    def __init__(self, knowledge_data):
+        self.knowledge_data = knowledge_data
+        self.llm = create_llm()
+        self.store = KnowledgeStore() 
 
-    @staticmethod
-    def aggerate_documents(documents: List[Document]):
-        return '\n\n'.join(document.page_content for document in documents)
+    def __call__(self, user_prompt: str, messages: List[BaseMessage] = []) -> str:
+        context = self.retrieve(user_prompt)
+        print(f" context : {type(context)}")
+        prompt = create_prompt(messages=messages)
+        rag_chain = (
+            {"context": lambda x: context, "question": RunnablePassthrough()} | prompt | self.llm
+        )
 
-    def retrive(self, user_prompt: str):
-        retriver = self.vector_store.as_retriever()
-        return retriver.invoke(user_prompt)
-
-    def __call__(self, user_prompt: str, messages: List[BaseMessage] = []):
-        prompt = core.prompt.create(messages=messages)
-        params = dict({
-            "context": self.vector_store.as_retriever() | self.aggerate_documents,
-            "question": RunnablePassthrough()
-        })
-
-        chain = (params
-                 | prompt
-                 | self.llm
-                 | StrOutputParser())
-
-        ai_message = chain.invoke(user_prompt)
+        ai_message = rag_chain.invoke(user_prompt)
         return ai_message
+
+    def retrieve(self, query: str) -> str:
+        return self.store.retrieve(query) 
