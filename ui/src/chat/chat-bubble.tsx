@@ -7,7 +7,7 @@ interface ChatBubbleProps {
   role: 'human' | 'ai'
 }
 
-const BubbleCommonClass = 'px-4 py-2 max-w-52 flex items-center rounded-md'
+const BubbleCommonClass = 'px-4 py-2 max-w-80 flex items-center rounded-md'
 
 function BubbleAvatar({ children }: React.PropsWithChildren<{}>) {
   return (

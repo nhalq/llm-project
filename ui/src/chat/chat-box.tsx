@@ -51,7 +51,7 @@ export function ChatBox({ conversationUUID, open = true, onClose }: ChatBoxProps
 
   return (
     <div
-      className="w-[384px] h-[512px] flex flex-col rounded-xl rounded-br-none bg-white shadow-xl transition-all duration-200 overflow-hidden [&>*]:px-4"
+      className="size-[512px] flex flex-col rounded-xl rounded-br-none bg-white shadow-xl transition-all duration-200 overflow-hidden [&>*]:px-4"
       style={open ? { opacity: 1 } : { width: 0, height: 0 }}
     >
       <div className="h-14 flex items-center shadow-sm">
