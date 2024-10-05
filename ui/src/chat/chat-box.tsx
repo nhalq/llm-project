@@ -94,21 +94,7 @@ export function ChatBox({ conversationUUID, open = true, onClose }: ChatBoxProps
           <ChatBubble key={index} role={role} message={'Đang trả lời...'} />
         ))}
       </div>
-      <form
-        className="border-t"
-        onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault()
-
-          const messageTarget = event.currentTarget.message as HTMLInputElement | undefined
-          if (!messageTarget?.value?.trim()) {
-            return
-          }
-
-          const message = messageTarget.value.trim()
-          sendMessage(message)
-          messageTarget.value = ''
-        }}
-      >
+      <div className="border-t">
         <div className="py-4 flex flex-col gap-4">
           {messages.length === 1 && (
             <div className="flex flex-wrap gap-2 justify-center ">
@@ -123,14 +109,29 @@ export function ChatBox({ conversationUUID, open = true, onClose }: ChatBoxProps
               ))}
             </div>
           )}
+          <form
+            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+              event.preventDefault()
+
+              const messageTarget = event.currentTarget.message as HTMLInputElement | undefined
+              if (!messageTarget?.value?.trim()) {
+                return
+              }
+
+              const message = messageTarget.value.trim()
+              sendMessage(message)
+              messageTarget.value = ''
+            }}
+          >
           <div className="flex gap-2">
             <Input name="message" placeholder="Gõ câu hỏi tại đây" autoComplete="off" />
             <Button type="submit" buttonType="primary">
               <PaperAirplaneIcon className="size-6" />
             </Button>
           </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   )
 }
